@@ -1,0 +1,1 @@
+Log file should be named: log.log

@@ -1,0 +1,5 @@
+.env should be the following:
+
+# Environment Config 
+
+MONGODB_URL=
