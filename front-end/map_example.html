@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Directions Service</title>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 25%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="floating-panel">
+     <form>
+      <label for="start">Start:</label>
+      <input type="text" id="start" name="start" value="Boulder, CO"><br>
+      <label for="end">End:</label>
+      <input type="text" id="end" name="end" value="Sedona, AZ"><br>
+      <input type="button" id="myButton" value="submit">
+    </form> 
+    </div>
+    <div id="map"></div>
+    <script>
+      function initMap() {
+        var directionsService = new google.maps.DirectionsService();
+        var directionsRenderer = new google.maps.DirectionsRenderer();
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 7,
+          center: {lat: 40.0150, lng: -105.2705}
+        });
+        directionsRenderer.setMap(map);
+
+        var onClickHandler = function() {
+          calculateAndDisplayRoute(directionsService, directionsRenderer);
+        };
+        document.getElementById('myButton').addEventListener('click', onClickHandler);
+      }
+
+      function calculateAndDisplayRoute(directionsService, directionsRenderer) {
+        var start = document.getElementById('start').value;
+        var end = document.getElementById('end').value;
+        var num_waypoints = 10; // Ideally this should be retrieved from user
+        fetch(`http://localhost:3000/api/v1/trips/calculatetrip?origin=${start}&destination=${end}&num_waypoints=${num_waypoints}`)
+        .then((response) => {
+          console.log("Response: " + response);
+          return response.json();
+        })
+        .then((data) => {
+          // Extract waypoint coordinates from response
+          var waypoints = data.waypoints.map((waypoint => {
+            return {'location': waypoint.geometry.location};
+          }))
+          console.log(waypoints);
+          // Calculate and render route
+          directionsService.route(
+            {
+              origin: start,
+              destination: end,
+              waypoints: waypoints,
+              travelMode: 'DRIVING'
+            },
+            function(response, status) {
+              if (status === 'OK') {
+                directionsRenderer.setDirections(response);
+              } else {
+                window.alert('Directions request failed due to ' + status);
+              }
+          });
+        })
+        .catch((err) => {
+          console.log("Error: " + err);
+          window.alert("Unable to calculate route");
+        });
+      }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=API_KEY&callback=initMap">
+    </script>
+  </body>
+</html>
