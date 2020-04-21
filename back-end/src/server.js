@@ -2,11 +2,17 @@ const port = process.env.PORT || 3000
 const logger = require('./logger.js')
 const database = require('./app/database/createDatabase.js')({logger})
 const app = require('./app/createExpressApp.js')({logger, database})
-const server = require('http').createServer()
+const https = require('https');
+const fs = require('fs');
 
 
+const options = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
+};
 
-server
+https
+    .createServer(options, (req, res) => {})
     .on('request', app)
     .on('listening', function() {
         const addr = this.address()
