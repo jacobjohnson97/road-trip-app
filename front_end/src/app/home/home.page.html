@@ -1,0 +1,66 @@
+<ion-content [fullscreen]="true">
+
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Blank</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-grid style="height: 100%">
+    <ion-row style="height: 100%">
+
+      <ion-col>
+        <ion-grid style="height: 100%">
+          <ion-row style="text-align: center">
+            <ion-button *ngIf="places.length > 0" (click)="openSearchModal()" style="margin: 0 auto">New Search</ion-button>
+            <ion-button *ngIf="places.length > 0" (click)="saveTrip()" style="margin: 0 auto" color="tertiary" [disabled]="awaitSaveTrip">
+                <span *ngIf="!awaitSaveTrip">Save Trip</span>
+                <ion-spinner *ngIf="awaitSaveTrip" slot="end" name="dots" style="size: 50%"></ion-spinner>
+            </ion-button><!--[disabled]="trip in trips"-->
+            <ion-button *ngIf="loggedIn" (click)="openTripsModal()" style="margin: 0 auto">My Trips</ion-button>
+            <ion-button *ngIf="loggedIn" (click)="logout()" style="margin: 0 auto" color="tertiary">Logout</ion-button>
+            <ion-button *ngIf="!loggedIn" (click)="openLoginModal()" style="margin: 0 auto">Login</ion-button>
+          </ion-row>
+          <ion-row style="height: 80%; overflow: scroll; text-align: center">
+            <div *ngIf="places.length == 0" style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center">
+              <ion-button (click)="openSearchModal()" style="height: 100px; width: 200px">New Search</ion-button>
+            </div>
+            <div *ngIf="places.length > 0">
+              <ion-card *ngFor="let place of places; let i = index" style="width: 30%; height: 30%; float: left; color: white" button (click)="selectedCard == i ? selectedCard = null : selectedCard = i" [ngStyle]="{'background-color': selectedCard == i ? 'dodgerblue' : '#2E2E2E'}">
+                <div style="margin-top: 10px">{{place.name}}</div>
+                <img style="height: 100px; margin-top: 10px; margin-bottom: 10px" src={{place.imgSrc}}>
+                <div>Rating: {{place.rating}}</div>
+              </ion-card>
+            </div>
+          </ion-row>
+          <ion-row style="height: 10%">
+            <ion-card *ngIf="selectedCard != null" style="height: 100%; width: 100%; --background: #2E2E2E; color: white">
+              {{places[selectedCard].name}}
+            </ion-card>
+          </ion-row>
+        </ion-grid>
+      </ion-col>
+
+      <ion-col>
+        <!--<ion-fab style="position: absolute; z-index: 2; top: 20px; right: 20px">
+          <ion-fab-button>
+            <ion-icon name="arrow-forward-circle"></ion-icon>
+          </ion-fab-button>
+          <ion-fab-list side="end">
+            <ion-fab-button><ion-icon name="logo-vimeo"></ion-icon></ion-fab-button>
+            <ion-fab-button><ion-icon name="logo-vimeo"></ion-icon></ion-fab-button>
+            <ion-fab-button><ion-icon name="logo-vimeo"></ion-icon></ion-fab-button>
+          </ion-fab-list>
+        </ion-fab>-->
+        <iframe
+          width="100%"
+          height="100%"
+          frameborder="0" style="border:0"
+          src="https://www.google.com/maps/embed/v1/place?key=AIzaSyC54feTdQxmyNv1yw6_3qTkxT7WLH37wGk&q=Space+Needle,Seattle+WA" allowfullscreen>
+        </iframe>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+
+</ion-content>

@@ -1,0 +1,60 @@
+<ion-card style="height: 100%; overflow: scroll">
+
+  <div *ngIf="action == Action.LOGIN" style="text-align: center">
+
+    <h1 style="color: white"><b>Login</b></h1>
+
+    <br><br>
+    <ion-item>
+      <ion-input type="text" placeholder="Email" [(ngModel)]="loginEmail"></ion-input>
+    </ion-item>
+    <div *ngIf="errorRaised" style="margin-top: 3px">Email must be valid</div>
+    <br>
+    <ion-item>
+      <ion-input type="password" placeholder="Password" [(ngModel)]="loginPassword"></ion-input>
+    </ion-item>
+    <div *ngIf="errorRaised" style="margin-top: 3px">Password must be 8 or more characters</div>
+    <br><br>
+
+    <ion-button color="tertiary" (click)="login()" [disabled]="awaitLogin">
+      <span *ngIf="!awaitLogin">Login</span>
+      <ion-spinner *ngIf="awaitLogin" slot="end" name="dots" style="size: 50%"></ion-spinner>
+    </ion-button>
+    <br><br><br>
+    <h3 style="color: white"><b>Don't have an account?</b></h3>
+    <ion-button color="secondary" (click)="action = Action.REGISTER; errorRaised = false" [disabled]="awaitLogin">Register</ion-button>
+
+  </div>
+
+  <div *ngIf="action == Action.REGISTER" style="text-align: center">
+
+    <h1 style="color: white"><b>Register</b></h1>
+
+    <br><br>
+    <ion-item>
+      <ion-input type="text" placeholder="Email" [(ngModel)]="registerEmail"></ion-input>
+    </ion-item>
+    <div *ngIf="errorRaised" style="margin-top: 3px">Email must be valid</div>
+    <br>
+    <ion-item>
+      <ion-input type="password" placeholder="Password" [(ngModel)]="registerPassword"></ion-input>
+    </ion-item>
+    <div *ngIf="errorRaised" style="margin-top: 3px">Password must be 8 or more characters</div>
+    <br>
+    <ion-item>
+      <ion-input type="password" placeholder="Confirm Password" [(ngModel)]="confirmPassword"></ion-input>
+    </ion-item>
+    <div *ngIf="errorRaised" style="margin-top: 3px">Password must be 8 or more characters and match above</div>
+    <br><br>
+
+    <ion-button color="tertiary" (click)="registerUser()" [disabled]="awaitRegister">
+      <span *ngIf="!awaitRegister">Register</span>
+      <ion-spinner *ngIf="awaitRegister" slot="end" name="dots" style="size: 50%"></ion-spinner>
+    </ion-button>
+    <br><br><br>
+    <h3 style="color: white"><b>Already have an account?</b></h3>
+    <ion-button color="secondary" (click)="action = Action.LOGIN; errorRaised = false" [disabled]="awaitRegister">Login</ion-button>
+
+  </div>
+
+</ion-card>

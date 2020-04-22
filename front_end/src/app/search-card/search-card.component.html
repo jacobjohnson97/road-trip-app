@@ -1,0 +1,63 @@
+<ion-card style="opacity: 0.8; height: 100%">
+
+  <ion-segment (ionChange)="currentSearchType = $event.detail['value']" value={{currentSearchType}}>
+    <ion-segment-button value={{SearchType.AREA_RADIUS}}>
+      <ion-label>Area Radius</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value={{SearchType.START_END}}>
+      <ion-label>Start and End</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <div *ngIf="currentSearchType == SearchType.AREA_RADIUS">
+
+    <br><br><br>
+    <ion-item>
+      <ion-label>Location:</ion-label>
+      <ion-input type="text" placeholder="Begin typing to search..."></ion-input>
+    </ion-item>
+
+    <br><br><br>
+    <ion-item>
+      <ion-label>Radius: {{currentRadius}}</ion-label>
+      <ion-range style="width: 70%" min="50" max="500" (ionChange)="currentRadius = $event.detail['value']" value={{currentRadius}}>
+      </ion-range>
+      <ion-segment style="width: 20%" (ionChange)="currentUnits = $event.detail['value']" value={{currentDistanceUnits}}>
+        <ion-segment-button value={{DistanceUnits.MILES}}>
+          <ion-label>mi</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value={{DistanceUnits.KILOMETERS}}>
+          <ion-label>km</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-item>
+
+  </div>
+
+  <div *ngIf="currentSearchType == SearchType.START_END">
+    <br><br><br>
+    <ion-item>
+      <ion-label>Start Location:</ion-label>
+      <ion-input type="text" placeholder="Begin typing to search..."></ion-input>
+    </ion-item>
+    <br><br><br>
+    <ion-item>
+      <ion-label>End Location:</ion-label>
+      <ion-input type="text" placeholder="Begin typing to search..."></ion-input>
+    </ion-item>
+  </div>
+
+  <br><br><br>
+  <ion-item>
+    <!--NUMBER OF STOPS-->
+    <ion-label>Filter By:</ion-label>
+    <ion-input type="text" placeholder="Filter"></ion-input>
+  </ion-item>
+
+  <br><br><br>
+  <div style="text-align: center">
+    <ion-button (click)="closeModal()">Cancel</ion-button>
+    <ion-button color="tertiary" (click)="closeModal()">Go</ion-button>
+  </div>
+
+</ion-card>
