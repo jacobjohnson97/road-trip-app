@@ -2,7 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const expressWinston = require('express-winston')
 const router = require('./routes/createRouter.js')()
-
+const cors = require('cors')
 
 
 
@@ -20,6 +20,7 @@ module.exports = ({logger, database }) => express()
 	    req.db = database
 	    return next()
 	})
+	.use(cors())
 	.use('/api', router)
 	.use((error, req, res, next) => {
 	    logger.error(error, error)
