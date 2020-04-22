@@ -18,7 +18,7 @@ module.exports = Router({mergeParams: true})
 
     const user = await req.db.Users.findOne({'email': email})
 
-    if(user.comparePassword(password)){
+    if(user && user.comparePassword(password)){
     	user.newToken();
 
     	res.send({'token': user.token});
