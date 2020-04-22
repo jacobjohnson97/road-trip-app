@@ -1,27 +1,30 @@
 {
-  "name": "quiplash",
+  "name": "roadtrip-app",
   "version": "1.0.0",
-  "description": "This is a clone of quiplash",
+  "description": "This is an app to create roadtrips",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "_moduleAliases": {
+  "@security" : "src/app/lib/security.js"
+ },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@googlemaps/google-maps-services-js": "^2.5.5",
-    "@mapbox/polyline": "^1.1.0",
     "accesscontrol": "^2.2.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "express-validator": "^6.4.0",
     "express-winston": "^4.0.2",
     "fs": "0.0.1-security",
     "glob": "^7.1.6",
+    "jsonwebtoken": "^8.5.1",
+    "module-alias": "^2.2.2",
     "mongodb": "^3.5.5",
     "mongoose": "^5.9.7",
     "mongoose-paginate": "^5.0.3",
     "request": "^2.88.0",
-    "spherical-geometry-js": "^2.0.0",
     "winston": "^3.2.1"
   }
 }
