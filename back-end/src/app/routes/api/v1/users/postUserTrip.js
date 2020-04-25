@@ -14,8 +14,10 @@ module.exports = Router({mergeParams: true})
     const trip = req.body.trip;
     const user = await req.db.Users.findOne({'email': req.token.user.email});
 	
+    console.log()
+
     if(user){
-    	user.trips.push({trip});
+    	user.trips.push({'trip': JSON.parse(trip)});
 		const updated = await user.save();
 		res.sendStatus(200)
     }else{
