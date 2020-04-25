@@ -8,24 +8,25 @@ const verify = require('@security').verifyToken;
  * If given and ID the trip is returned else all trips are returned
  */
 module.exports = Router({mergeParams: true})
-.get('/trip', [check('tripID').isAlphanumeric().optional()], verify, async (req, res, next) => {
+.delete('/trip', [check('tripID').isAlphanumeric()], verify, async (req, res, next) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {return res.status(422).json({ errors: errors.array() }) }
+    
     const tripID = req.query.tripID;
     const user = await req.db.Users.findOne({'email': req.token.user.email});
-	
+
     if(!user){
         req.logger.info({error: "User not found."});
         res.sendStatus(404);
         return;
     }
 
-    if(tripID){
-        res.send(user.trips.tripID)
-    }else{
-        res.send(user.trips)
-        
+    try{
+    	user.trips.id(tripID).remove();
+    	await user.save();
+    	res.sendStatus(200);
+    }catch{
+    	res.sendStatus(400);
     }
-    
 })

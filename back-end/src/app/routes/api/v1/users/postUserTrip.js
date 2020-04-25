@@ -7,7 +7,7 @@ const verify = require('@security').verifyToken;
  * This endpoint adds a user's trip to the database
  */
 module.exports = Router({mergeParams: true})
-.post('/trip', [check('trip')], verify, async (req, res, next) => {
+.post('/trip', [check('trip').isAscii()], verify, async (req, res, next) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {return res.status(422).json({ errors: errors.array() }) }
@@ -15,7 +15,7 @@ module.exports = Router({mergeParams: true})
     const user = await req.db.Users.findOne({'email': req.token.user.email});
 	
     if(user){
-    	user.trips.push(trip);
+    	user.trips.push({trip});
 		const updated = await user.save();
 		res.sendStatus(200)
     }else{

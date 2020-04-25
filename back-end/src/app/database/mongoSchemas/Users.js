@@ -3,6 +3,10 @@ const security = require('../../lib/security');
 
 const { Schema } = mongoose;
 
+const tripSchema = new Schema({
+    trip: JSON,
+})
+
 const userSchema = new Schema({
 
 	email: {
@@ -23,7 +27,7 @@ const userSchema = new Schema({
 		type: String,
 	},
     trips: {
-        type: [Schema.Types.Mixed,],
+        type: [tripSchema],
     }
 })
 
