@@ -21,6 +21,7 @@
             <ion-button *ngIf="loggedIn" (click)="logout()" style="margin: 0 auto" color="tertiary">Logout</ion-button>
             <ion-button *ngIf="!loggedIn" (click)="openLoginModal()" style="margin: 0 auto">Login</ion-button>
           </ion-row>
+          <br>
           <ion-row style="height: 80%; overflow: scroll; text-align: center">
             <div *ngIf="places.length == 0" style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center">
               <ion-button (click)="openSearchModal()" style="height: 100px; width: 200px">New Search</ion-button>
@@ -28,7 +29,7 @@
             <div *ngIf="places.length > 0">
               <ion-card *ngFor="let place of places; let i = index" style="width: 30%; height: 30%; float: left; color: white" button (click)="selectedCard == i ? selectedCard = null : selectedCard = i" [ngStyle]="{'background-color': selectedCard == i ? 'dodgerblue' : '#2E2E2E'}">
                 <div style="margin-top: 10px">{{place.name}}</div>
-                <img style="height: 100px; margin-top: 10px; margin-bottom: 10px" src={{place.imgSrc}}>
+                <img style="height: 100px; margin-top: 10px; margin-bottom: 10px" src={{place.photos[0]}}>
                 <div>Rating: {{place.rating}}</div>
               </ion-card>
             </div>
@@ -52,12 +53,7 @@
             <ion-fab-button><ion-icon name="logo-vimeo"></ion-icon></ion-fab-button>
           </ion-fab-list>
         </ion-fab>-->
-        <iframe
-          width="100%"
-          height="100%"
-          frameborder="0" style="border:0"
-          src="https://www.google.com/maps/embed/v1/place?key=AIzaSyC54feTdQxmyNv1yw6_3qTkxT7WLH37wGk&q=Space+Needle,Seattle+WA" allowfullscreen>
-        </iframe>
+        <div #gmap style="height: 100%; width: 100%"></div>
       </ion-col>
 
     </ion-row>

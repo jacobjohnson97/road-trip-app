@@ -1,4 +1,4 @@
-<ion-card style="opacity: 0.8; height: 100%">
+<ion-card style="height: 100%">
 
   <ion-segment (ionChange)="currentSearchType = $event.detail['value']" value={{currentSearchType}}>
     <ion-segment-button value={{SearchType.AREA_RADIUS}}>
@@ -9,55 +9,70 @@
     </ion-segment-button>
   </ion-segment>
 
+  <br><br>
+  <ion-item>
+    <ion-input type="text" placeholder="Start Location..." [(ngModel)]="startLocationModel" (ionFocus)="showPopoverOrigin = true" (ionChange)="placeAutocompleteOrigin(startLocationModel)"></ion-input>
+  </ion-item>
+
+  <ion-list *ngIf="showPopoverOrigin"><!--style="position: absolute; z-index: 2"-->
+    <ion-item *ngIf="autoCompleteOptionsOrigin.length == 0 && !awaitAutocomplete">Begin typing to search...</ion-item>
+    <ion-item *ngIf="awaitAutocomplete"><ion-spinner name="dots" style="size: 50%"></ion-spinner></ion-item>
+    <ion-item *ngFor="let place of autoCompleteOptionsOrigin" button (click)="selectOptionOrigin(place)">{{place}}</ion-item>
+    <ion-item (click)="showPopoverOrigin = false" button>Close</ion-item>
+  </ion-list>
+
   <div *ngIf="currentSearchType == SearchType.AREA_RADIUS">
 
-    <br><br><br>
+    <br><br>
     <ion-item>
-      <ion-label>Location:</ion-label>
-      <ion-input type="text" placeholder="Begin typing to search..."></ion-input>
-    </ion-item>
-
-    <br><br><br>
-    <ion-item>
-      <ion-label>Radius: {{currentRadius}}</ion-label>
-      <ion-range style="width: 70%" min="50" max="500" (ionChange)="currentRadius = $event.detail['value']" value={{currentRadius}}>
-      </ion-range>
-      <ion-segment style="width: 20%" (ionChange)="currentUnits = $event.detail['value']" value={{currentDistanceUnits}}>
+      <ion-label>Radius: {{radiusModel}} miles</ion-label>
+      <ion-range style="width: 90%" min={{minRadius}} max={{maxRadius}} [(ngModel)]="radiusModel"></ion-range>
+      <!--<ion-segment style="width: 20%" [(ngModel)]="distanceUnitsModel">
         <ion-segment-button value={{DistanceUnits.MILES}}>
           <ion-label>mi</ion-label>
         </ion-segment-button>
         <ion-segment-button value={{DistanceUnits.KILOMETERS}}>
           <ion-label>km</ion-label>
         </ion-segment-button>
-      </ion-segment>
+      </ion-segment>-->
     </ion-item>
 
   </div>
 
   <div *ngIf="currentSearchType == SearchType.START_END">
-    <br><br><br>
+    <br><br>
     <ion-item>
-      <ion-label>Start Location:</ion-label>
-      <ion-input type="text" placeholder="Begin typing to search..."></ion-input>
+      <ion-input type="text" placeholder="End Location..." [(ngModel)]="endLocationModel" (ionFocus)="showPopoverDestination = true" (ionChange)="placeAutocompleteDestination(endLocationModel)"></ion-input>
     </ion-item>
-    <br><br><br>
-    <ion-item>
-      <ion-label>End Location:</ion-label>
-      <ion-input type="text" placeholder="Begin typing to search..."></ion-input>
-    </ion-item>
+    <ion-list *ngIf="showPopoverDestination"><!--style="position: absolute; z-index: 2"-->
+      <ion-item *ngIf="autoCompleteOptionsDestination.length == 0 && !awaitAutocomplete">Begin typing to search...</ion-item>
+      <ion-item *ngIf="awaitAutocomplete"><ion-spinner name="dots" style="size: 50%"></ion-spinner></ion-item>
+      <ion-item *ngFor="let place of autoCompleteOptionsDestination" button (click)="selectOptionDestination(place)">{{place}}</ion-item>
+      <ion-item (click)="showPopoverDestination = false" button>Close</ion-item>
+    </ion-list>
   </div>
 
-  <br><br><br>
+  <br><br>
   <ion-item>
-    <!--NUMBER OF STOPS-->
-    <ion-label>Filter By:</ion-label>
-    <ion-input type="text" placeholder="Filter"></ion-input>
+    <ion-label>Stops: {{stopsModel}}</ion-label>
+    <ion-range min="1" max="20" [(ngModel)]="stopsModel"></ion-range>
   </ion-item>
 
-  <br><br><br>
+  <br><br>
+  <ion-item>
+    <ion-label>Location Filters:</ion-label>
+    <ion-select multiple="true" [(ngModel)]="filtersModel">
+      <ion-select-option *ngFor="let filter of locationFilters; let i = index" value={{properFilters[i]}}>{{filter}}</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <br><br>
   <div style="text-align: center">
-    <ion-button (click)="closeModal()">Cancel</ion-button>
-    <ion-button color="tertiary" (click)="closeModal()">Go</ion-button>
+    <ion-button (click)="closeModal()" [disabled]="awaitHttp">Cancel</ion-button>
+    <ion-button color="tertiary" (click)="getTrip()" [disabled]="awaitHttp">
+      <span *ngIf="!awaitHttp">Go</span>
+      <ion-spinner *ngIf="awaitHttp" slot="end" name="dots" style="size: 50%"></ion-spinner>
+    </ion-button>
   </div>
 
 </ion-card>
