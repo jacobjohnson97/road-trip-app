@@ -10,7 +10,6 @@ module.exports = Router({mergeParams: true})
 .get('/v1/trips/calculatetrip', async (req, res, next) => {
     try {
         var route = await calculateTrip(req.query);
-        res.header('Access-Control-Allow-Origin', '*'); // Only way I've found to prevent cors error
         res.status(200).json(route);
     } catch(error) {
         next(error)
@@ -18,16 +17,18 @@ module.exports = Router({mergeParams: true})
 });
 
 /*
- * Takes in a params object with the following parameters: origin, num_waypoints, and either destination or radius (in miles)
+ * Takes in a params object with the following parameters: origin, num_waypoints, types, and either destination or radius (in miles)
  * Calculates a route with a number of stops equal to num_waypoints
  * Returns a route object containing: origin, destination, and an array of waypoints. 
  * Check Google Maps docs for structure of waypoint object
 */
 async function calculateTrip(params) {
     var origin = params.origin;
-    var num_waypoints = params.num_waypoints;
+    var num_waypoints = parseInt(params.num_waypoints);
+    var types = params.types.split(',');
+    types.push("tourist_attraction");
     // if only a radius is provided, calculate a random destination near edge of radius
-    var destination = 'destination' in params ? params.destination : await calculateDestination(origin, params.radius);
+    var destination = 'destination' in params ? params.destination : await calculateDestination(origin, parseInt(params.radius));
     var initial_route = await client
     .directions({
       params: {
@@ -38,11 +39,12 @@ async function calculateTrip(params) {
       timeout: 2000 // milliseconds
     });
     var points = polyline.decode(initial_route.data.routes[0].overview_polyline.points);
-    var x = Math.floor(points.length/num_waypoints);
+    var x = Math.floor(points.length/(num_waypoints+1));
     var waypoints = [];
     var waypoint_radius = 50000; // how far out from each point we should search for a place
-    for (let i = x; i < points.length; i += x) {
-      var waypoint = await findPlace(points[i], waypoint_radius, waypoints);
+    for (let i = 1; i <= num_waypoints; i++) {
+      var type = types[(i-1)%types.length];
+      var waypoint = await findPlace(points[i*x], waypoint_radius, waypoints, type);
       waypoints.push(waypoint);
     }
     return {
@@ -53,14 +55,13 @@ async function calculateTrip(params) {
   }
   
 
-  // TODO: Function should accept a list of types
-  async function findPlace(location, radius, waypoints) {
+  async function findPlace(location, radius, waypoints, type) {
     var places = await client
       .placesNearby({
         params: {
           location: location,
           radius: radius,
-          type: "tourist_attraction",  // Type will vary depending on user input
+          type: type, 
           key: process.env.GOOGLE_MAPS_API_KEY
         },
         timeout: 1000
@@ -89,6 +90,6 @@ async function calculateTrip(params) {
       });
       var origin_coords = origin_details.data.candidates[0].geometry.location;
       var dest_coords = geometry.computeOffset(origin_coords, radius*1609, heading); // Compute random destination coordinates
-      var dest = await findPlace([dest_coords.lat(), dest_coords.lng()], 30000, []); // Get name of nearby destination
+      var dest = await findPlace([dest_coords.lat(), dest_coords.lng()], 30000, [], "tourist_attraction"); // Get name of nearby destination
       return dest.name;
   }
