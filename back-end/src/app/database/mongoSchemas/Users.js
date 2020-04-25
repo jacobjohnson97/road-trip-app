@@ -22,7 +22,11 @@ const userSchema = new Schema({
 	last_login: {
 		type: String,
 	},
+    trips: {
+        type: [Schema.Types.Mixed,],
+    }
 })
+
 
 userSchema.methods.comparePassword = function(password) {
     if(this.password === security.genHash(password, this.salt)){return true}

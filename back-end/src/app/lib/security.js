@@ -64,6 +64,7 @@ module.exports = {
         res.sendStatus(403);
         return;
       }else{
+        req.token = authData;
         next();
       }
     })
