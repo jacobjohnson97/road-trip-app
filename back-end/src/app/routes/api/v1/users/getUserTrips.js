@@ -28,6 +28,7 @@ module.exports = Router({mergeParams: true})
         res.send(user.trips.tripID)
     }else{
         res.send(user.trips)
+        
     }
     
 })
