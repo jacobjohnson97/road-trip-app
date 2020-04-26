@@ -54,7 +54,9 @@ async function calculateTrip(params) {
     for (let i = 1; i <= num_waypoints; i++) {
       var type = types[(i-1)%types.length];
       var waypoint = await findPlace(points[i*x], waypoint_radius, waypoints, type);
-      waypoints.push(waypoint);
+      if (waypoint != null) {
+        waypoints.push(waypoint);
+      }
     }
     return {
         'origin': origin,
@@ -75,8 +77,17 @@ async function calculateTrip(params) {
         },
         timeout: 1000
       });
-      if (places.status == "ZERO_RESULTS") {
-        throw "Zero results founds";
+      if (places.data.status == "ZERO_RESULTS") {
+        places = await client
+        .placesNearby({
+          params: {
+            location: location,
+            radius: radius,
+            type: "tourist_attraction", 
+            key: process.env.GOOGLE_MAPS_API_KEY
+          },
+          timeout: 1000
+        });
       }
       var i = 0;
       // prevent duplicates waypoints
@@ -88,9 +99,7 @@ async function calculateTrip(params) {
 
 
   async function calculateDestination(origin, radius) {
-      var heading = Math.floor(Math.random() * 360); // Calculate random heading from origin
-      // TODO: Assumes origin is the name of a place, need to handle case of lat/lng coords
-      var origin_details = await client
+    var origin_details = await client
       .findPlaceFromText({
         params: {
           input: origin,
@@ -100,8 +109,15 @@ async function calculateTrip(params) {
         },
         timeout: 1000
       });
-      var origin_coords = origin_details.data.candidates[0].geometry.location;
+    var origin_coords = origin_details.data.candidates[0].geometry.location;
+    var dest_found = false;
+    while (!dest_found) {
+      var heading = Math.floor(Math.random() * 360); // Calculate random heading from origin
       var dest_coords = geometry.computeOffset(origin_coords, radius*1609, heading); // Compute random destination coordinates
       var dest = await findPlace([dest_coords.lat(), dest_coords.lng()], 30000, [], "tourist_attraction"); // Get name of nearby destination
-      return dest.name;
+      if ('name' in dest) {
+        dest_found = true;
+      }
+    }
+    return dest.name;
   }
