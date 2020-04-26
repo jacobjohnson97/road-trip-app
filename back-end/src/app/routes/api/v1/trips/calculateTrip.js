@@ -2,18 +2,27 @@ const Router = require('express').Router;
 const Client = require("@googlemaps/google-maps-services-js").Client;
 var polyline = require('@mapbox/polyline');
 var geometry = require('spherical-geometry-js');
+const { check, validationResult } = require('express-validator');
 require('dotenv').config( {path: '../../../../.env'} );
 
 const client = new Client({});
 
 module.exports = Router({mergeParams: true})
-.get('/v1/trips/calculatetrip', async (req, res, next) => {
-    try {
-        var route = await calculateTrip(req.query);
-        res.status(200).json(route);
-    } catch(error) {
-        next(error)
-    }
+.get('/v1/trips/calculatetrip',
+    [check('origin'),
+    check('destination').optional(),
+    check('radius').optional().isNumeric(),
+    check('num_waypoints').isNumeric(),
+    check('types').isString()],
+    async (req, res, next) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {return res.status(422).json({ errors: errors.array() }) }
+      try {
+          var route = await calculateTrip(req.query);
+          res.status(200).json(route);
+      } catch(error) {
+          next(error)
+      }
 });
 
 /*
@@ -25,7 +34,7 @@ module.exports = Router({mergeParams: true})
 async function calculateTrip(params) {
     var origin = params.origin;
     var num_waypoints = parseInt(params.num_waypoints);
-    var types = params.types.split(',');
+    var types = params.types == "" ? [] : params.types.split(',');
     types.push("tourist_attraction");
     // if only a radius is provided, calculate a random destination near edge of radius
     var destination = 'destination' in params ? params.destination : await calculateDestination(origin, parseInt(params.radius));
@@ -66,6 +75,9 @@ async function calculateTrip(params) {
         },
         timeout: 1000
       });
+      if (places.status == "ZERO_RESULTS") {
+        throw "Zero results founds";
+      }
       var i = 0;
       // prevent duplicates waypoints
       while (waypoints.includes(places.data.results[i])) {
