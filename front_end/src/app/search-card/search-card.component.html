@@ -68,7 +68,6 @@
 
   <br><br>
   <div style="text-align: center">
-    <ion-button (click)="closeModal()" [disabled]="awaitHttp">Cancel</ion-button>
     <ion-button color="tertiary" (click)="getTrip()" [disabled]="awaitHttp">
       <span *ngIf="!awaitHttp">Go</span>
       <ion-spinner *ngIf="awaitHttp" slot="end" name="dots" style="size: 50%"></ion-spinner>

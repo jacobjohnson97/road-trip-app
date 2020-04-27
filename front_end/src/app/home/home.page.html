@@ -1,62 +1,71 @@
-<ion-content [fullscreen]="true">
+<ion-content>
 
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-menu side="start" contentId="main-menu" type="overlay" swipeGesture="false">
+    <ion-content id="content">
+      <ion-menu-toggle autoHide="false">
+        <div style="height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center">
+          <ion-button *ngIf="loggedIn" (click)="openTripsModal()">My Trips</ion-button>
+          <ion-button *ngIf="loggedIn" (click)="logout()" color="tertiary">Logout</ion-button>
+          <ion-button *ngIf="!loggedIn" (click)="openLoginModal()">Login</ion-button>
+        </div>
+      </ion-menu-toggle>
+    </ion-content>
+  </ion-menu>
 
   <ion-grid style="height: 100%">
+
     <ion-row style="height: 100%">
 
-      <ion-col>
-        <ion-grid style="height: 100%">
-          <ion-row style="text-align: center">
-            <ion-button *ngIf="places.length > 0" (click)="openSearchModal()" style="margin: 0 auto">New Search</ion-button>
-            <ion-button *ngIf="places.length > 0" (click)="saveTrip()" style="margin: 0 auto" color="tertiary" [disabled]="awaitSaveTrip">
-                <span *ngIf="!awaitSaveTrip">Save Trip</span>
-                <ion-spinner *ngIf="awaitSaveTrip" slot="end" name="dots" style="size: 50%"></ion-spinner>
-            </ion-button><!--[disabled]="trip in trips"-->
-            <ion-button *ngIf="loggedIn" (click)="openTripsModal()" style="margin: 0 auto">My Trips</ion-button>
-            <ion-button *ngIf="loggedIn" (click)="logout()" style="margin: 0 auto" color="tertiary">Logout</ion-button>
-            <ion-button *ngIf="!loggedIn" (click)="openLoginModal()" style="margin: 0 auto">Login</ion-button>
-          </ion-row>
-          <br>
-          <ion-row style="height: 80%; overflow: scroll; text-align: center">
-            <div *ngIf="places.length == 0" style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center">
-              <ion-button (click)="openSearchModal()" style="height: 100px; width: 200px">New Search</ion-button>
-            </div>
-            <div *ngIf="places.length > 0">
-              <ion-card *ngFor="let place of places; let i = index" style="width: 30%; height: 30%; float: left; color: white" button (click)="selectedCard == i ? selectedCard = null : selectedCard = i" [ngStyle]="{'background-color': selectedCard == i ? 'dodgerblue' : '#2E2E2E'}">
-                <div style="margin-top: 10px">{{place.name}}</div>
-                <img style="height: 100px; margin-top: 10px; margin-bottom: 10px" src={{place.photos[0]}}>
-                <div>Rating: {{place.rating}}</div>
-              </ion-card>
-            </div>
-          </ion-row>
-          <ion-row style="height: 10%">
-            <ion-card *ngIf="selectedCard != null" style="height: 100%; width: 100%; --background: #2E2E2E; color: white">
-              {{places[selectedCard].name}}
-            </ion-card>
-          </ion-row>
-        </ion-grid>
-      </ion-col>
+    <ion-col>
 
-      <ion-col>
-        <!--<ion-fab style="position: absolute; z-index: 2; top: 20px; right: 20px">
-          <ion-fab-button>
-            <ion-icon name="arrow-forward-circle"></ion-icon>
-          </ion-fab-button>
-          <ion-fab-list side="end">
-            <ion-fab-button><ion-icon name="logo-vimeo"></ion-icon></ion-fab-button>
-            <ion-fab-button><ion-icon name="logo-vimeo"></ion-icon></ion-fab-button>
-            <ion-fab-button><ion-icon name="logo-vimeo"></ion-icon></ion-fab-button>
-          </ion-fab-list>
-        </ion-fab>-->
-        <div #gmap style="height: 100%; width: 100%"></div>
-      </ion-col>
+      <ion-grid style="height: 100%">
+
+        <ion-row style="text-align: center">
+          <ion-menu-button autoHide="false"></ion-menu-button>
+          <ion-button *ngIf="places.length > 0" (click)="openSearchModal()" style="margin: 0 auto">New Search</ion-button>
+          <ion-button *ngIf="places.length > 0" (click)="saveTrip()" style="margin: 0 auto" color="tertiary" [disabled]="awaitSaveTrip || tripSaved">
+              <span *ngIf="!awaitSaveTrip">Save Trip</span>
+              <ion-spinner *ngIf="awaitSaveTrip" slot="end" name="dots" style="size: 50%"></ion-spinner>
+          </ion-button>
+          <ion-button *ngIf="places.length > 0" (click)="clearRoute()" style="margin: 0 auto">Clear</ion-button>
+        </ion-row>
+
+        <br>
+
+        <ion-row style="height: 90%; overflow: scroll; text-align: center">
+
+          <div *ngIf="places.length == 0" style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center">
+            <ion-button (click)="openSearchModal()" style="height: 100px; width: 200px">New Search</ion-button>
+          </div>
+
+          <div *ngIf="places.length > 0">
+            <div style="text-align: center; margin: 20px; font-size: 150%"><b>{{origin}}</b> to <b>{{destination}}</b></div>
+            <ion-card *ngFor="let place of places; let i = index" style="font-size: 100%; padding: 20px; float: left; color: white" button (click)="selectPlace(i)" [ngStyle]="{'background-color': selectedCard == i ? 'dodgerblue' : '#2E2E2E'}">
+              <div style="font-size: 150%">{{placeIndexes[i]}}</div>
+              <div style="margin-top: 10px">{{place.name}}</div>
+              <div style="margin-top: 10px">Rating: {{place.rating}}</div>
+              <img style="height: 25px; margin-top: 10px;" src={{place.icon}}>
+            </ion-card>
+          </div>
+
+        </ion-row>
+
+        <!--<ion-row style="height: 10%">
+          <ion-card *ngIf="selectedCard != null" style="height: 100%; width: 100%; --background: #2E2E2E; color: white">
+            {{places[selectedCard].name}}
+          </ion-card>
+        </ion-row>-->
+
+      </ion-grid>
+
+    </ion-col>
+
+    <ion-col>
+      <div #gmap style="height: 100%; width: 100%"></div>
+    </ion-col>
 
     </ion-row>
+
   </ion-grid>
 
 </ion-content>

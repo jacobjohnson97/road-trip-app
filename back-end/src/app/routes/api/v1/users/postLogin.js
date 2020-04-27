@@ -23,6 +23,6 @@ module.exports = Router({mergeParams: true})
 
     	res.send({'token': user.token});
     }else{
-    	res.sendStatus(403)
+        res.status(403).json({ status: 'Forbidden' });
     }
 })

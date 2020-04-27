@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController, AlertController, ToastController } from '@ionic/angular';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-my-trips',
@@ -8,24 +9,35 @@ import { ModalController, AlertController, ToastController } from '@ionic/angula
 })
 export class MyTripsComponent implements OnInit {
 
-  constructor(private modalController: ModalController, private alertController: AlertController, private toastController: ToastController) { }
+  constructor(private modalController: ModalController, private alertController: AlertController, private toastController: ToastController, private http : HttpClient) { }
 
   ngOnInit() {
-    // http get trips
+    this.awaitGetTrips = true;
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json; charset=utf-8',
+        'Authorization': 'Bearer ' + localStorage.getItem('sectok')
+      })
+    }
+    this.http.get(`https://localhost:3000/api/trip`, httpOptions).subscribe((response) => {
+      this.awaitGetTrips = false;
+      this.trips = response;
+    }, (err) => {
+      this.dangerToast('Something went wrong. Please try again later.');
+      this.awaitGetTrips = false;
+    });
   }
 
-  trips : any[] = [{name: 'Trip 1', date: '03-30-20'}, {name: 'Trip 2', date: '03-30-20'}];
+  trips : any = [];
   hover : number;
+  awaitGetTrips : boolean;
+  awaitDeleteTrip : boolean;
 
-  async closeModal() {
-    await this.modalController.dismiss('{}');
+  async selectTrip(tripIndex : number) {
+    await this.modalController.dismiss(JSON.stringify(this.trips[tripIndex]['trip']));
   }
 
-  async selectTrip(trip : number) {
-    await this.modalController.dismiss(JSON.stringify(this.trips[trip]));
-  }
-
-  async deleteTrip(trip : number) {
+  async deleteTrip(tripIndex : number) {
     const alert = await this.alertController.create({
       header: 'Delete',
       message: 'Are you sure you want to delete this trip?',
@@ -36,14 +48,21 @@ export class MyTripsComponent implements OnInit {
         {
           text: 'Delete',
           handler: () => {
-            // http request here
-            let error = false;
-            if (!error) {
-              this.successToast('Trip successfully deleted!')
-              this.trips.splice(trip, 1);
-            } else {
-              this.dangerToast('Something went wrong. Please try again later.')
-            }
+            this.awaitDeleteTrip = true;
+            const httpOptions = {
+              headers: new HttpHeaders({
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': 'Bearer ' + localStorage.getItem('sectok')
+              })
+            };
+            this.http.delete(`https://localhost:3000/api/trip?tripID=${this.trips[tripIndex]['_id']}`, httpOptions).subscribe((response) => {
+              this.successToast('Trip deleted successfully!');
+              this.awaitDeleteTrip = false;
+              this.ngOnInit();
+            }, (err) => {
+              this.dangerToast('Something went wrong. Please try again later.');
+              this.awaitDeleteTrip = false;
+            });
           }
         }
       ]
