@@ -57,7 +57,7 @@ export class SearchCardComponent implements OnInit {
       timer(1000).subscribe(() => {
         if (counter == this.autoCompleteCounter) {
           //https://cors-anywhere.herokuapp.com/
-          this.http.get(`https://desolate-forest-23640.herokuapp.com/https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${text}&key=API_KEY_HERE&components=country:us&types=(cities)`).subscribe((response) => {
+          this.http.get(`https://desolate-forest-23640.herokuapp.com/https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${text}&key=${process.env.GOOGLE_MAPS_API_KEY}&components=country:us&types=(cities)`).subscribe((response) => {
             this.awaitAutocomplete = false;  
             this.autoCompleteOptionsOrigin = [];
             for (let i = 0; i < response['predictions'].length; i++) {
@@ -81,7 +81,7 @@ export class SearchCardComponent implements OnInit {
       timer(1000).subscribe(() => {
         if (counter == this.autoCompleteCounter) {
           //https://cors-anywhere.herokuapp.com/
-          this.http.get(`https://desolate-forest-23640.herokuapp.com/https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${text}&key=API_KEY_HERE&components=country:us&types=(cities)`).subscribe((response) => {
+          this.http.get(`https://desolate-forest-23640.herokuapp.com/https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${text}&key=${process.env.GOOGLE_MAPS_API_KEY}&components=country:us&types=(cities)`).subscribe((response) => {
             this.awaitAutocomplete = false;  
             this.autoCompleteOptionsDestination = [];
             for (let i = 0; i < response['predictions'].length; i++) {
