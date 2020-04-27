@@ -16,53 +16,54 @@
 
     <ion-row style="height: 100%">
 
-    <ion-col>
+      <ion-col>
 
-      <ion-grid style="height: 100%">
+        <ion-grid style="height: 100%">
 
-        <ion-row style="text-align: center">
-          <ion-menu-button autoHide="false"></ion-menu-button>
-          <ion-button *ngIf="places.length > 0" (click)="openSearchModal()" style="margin: 0 auto">New Search</ion-button>
-          <ion-button *ngIf="places.length > 0" (click)="saveTrip()" style="margin: 0 auto" color="tertiary" [disabled]="awaitSaveTrip || tripSaved">
-              <span *ngIf="!awaitSaveTrip">Save Trip</span>
-              <ion-spinner *ngIf="awaitSaveTrip" slot="end" name="dots" style="size: 50%"></ion-spinner>
-          </ion-button>
-          <ion-button *ngIf="places.length > 0" (click)="clearRoute()" style="margin: 0 auto">Clear</ion-button>
-        </ion-row>
+          <ion-row style="text-align: center">
+            <ion-menu-button autoHide="false"></ion-menu-button>
+            <ion-button *ngIf="trip" (click)="openSearchModal()" style="margin: 0 auto">New Search</ion-button>
+            <ion-button *ngIf="trip" (click)="saveTrip()" style="margin: 0 auto" color="tertiary" [disabled]="awaitSaveTrip || tripSaved">
+                <span *ngIf="!awaitSaveTrip">Save Trip</span>
+                <ion-spinner *ngIf="awaitSaveTrip" slot="end" name="dots" style="size: 50%"></ion-spinner>
+            </ion-button>
+            <ion-button *ngIf="trip" (click)="clearRoute()" style="margin: 0 auto">Clear</ion-button>
+          </ion-row>
 
-        <br>
+          <br>
 
-        <ion-row style="height: 90%; overflow: scroll; text-align: center">
+          <ion-row style="height: 90%; overflow: scroll; text-align: center">
 
-          <div *ngIf="places.length == 0" style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center">
-            <ion-button (click)="openSearchModal()" style="height: 100px; width: 200px">New Search</ion-button>
-          </div>
+            <div *ngIf="!trip" style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center">
+              <ion-button (click)="openSearchModal()" style="height: 100px; width: 200px">New Search</ion-button>
+            </div>
 
-          <div *ngIf="places.length > 0">
-            <div style="text-align: center; margin: 20px; font-size: 150%"><b>{{origin}}</b> to <b>{{destination}}</b></div>
-            <ion-card *ngFor="let place of places; let i = index" style="font-size: 100%; padding: 20px; float: left; color: white" button (click)="selectPlace(i)" [ngStyle]="{'background-color': selectedCard == i ? 'dodgerblue' : '#2E2E2E'}">
-              <div style="font-size: 150%">{{placeIndexes[i]}}</div>
-              <div style="margin-top: 10px">{{place.name}}</div>
-              <div style="margin-top: 10px">Rating: {{place.rating}}</div>
-              <img style="height: 25px; margin-top: 10px;" src={{place.icon}}>
+            <div *ngIf="trip">
+              <div style="text-align: center; margin: 20px; font-size: 150%"><b>{{origin}}</b> to <b>{{destination}}</b></div>
+              <ion-card *ngFor="let place of places; let i = index" style="font-size: 100%; padding: 20px; float: left; color: white" button (click)="selectPlace(i)" [ngStyle]="{'background-color': selectedCard == i ? 'dodgerblue' : '#2E2E2E'}">
+                <div style="font-size: 150%">{{placeIndexes[i]}}</div>
+                <div style="margin-top: 10px">{{place.name}}</div>
+                <div><img style="height: 100px; margin-top: 10px;" class="waypoint-image"></div>
+                <div style="margin-top: 10px">Rating: {{place.rating}}</div>
+                <img style="height: 25px; margin-top: 10px;" src={{place.icon}}>
+              </ion-card>
+            </div>
+
+          </ion-row>
+
+          <!--<ion-row style="height: 10%">
+            <ion-card *ngIf="selectedCard != null" style="height: 100%; width: 100%; --background: #2E2E2E; color: white">
+              {{places[selectedCard].name}}
             </ion-card>
-          </div>
+          </ion-row>-->
 
-        </ion-row>
+        </ion-grid>
 
-        <!--<ion-row style="height: 10%">
-          <ion-card *ngIf="selectedCard != null" style="height: 100%; width: 100%; --background: #2E2E2E; color: white">
-            {{places[selectedCard].name}}
-          </ion-card>
-        </ion-row>-->
+      </ion-col>
 
-      </ion-grid>
-
-    </ion-col>
-
-    <ion-col>
-      <div #gmap style="height: 100%; width: 100%"></div>
-    </ion-col>
+      <ion-col>
+        <div #gmap style="height: 100%; width: 100%"></div>
+      </ion-col>
 
     </ion-row>
 

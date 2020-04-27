@@ -5,6 +5,7 @@ import { LoginCardComponent } from '../login-card/login-card.component';
 import { MyTripsComponent } from '../my-trips/my-trips.component';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { } from 'googlemaps';
+import { timer } from 'rxjs';
 
 enum TravelMode {
   BICYCLING = 'BICYCLING',
@@ -41,6 +42,7 @@ export class HomePage implements AfterViewInit {
   places : any[] = [];
   origin : string;
   destination : string;
+  photos : any[];
   placeIndexes : string[] = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
   ngAfterViewInit() {
@@ -155,7 +157,9 @@ export class HomePage implements AfterViewInit {
   }
 
   renderWaypointData(data : any) {
-    if (data != '{}') {
+
+    if (data && data != '{}') {
+
       this.newTrip = true;
       this.selectedCard = null;
       this.trip = data;
@@ -163,6 +167,7 @@ export class HomePage implements AfterViewInit {
       data = JSON.parse(data);
       this.origin = data['origin'];
       this.destination = data['destination'];
+
       console.log('Rendering:', data)
 
       let directionsService = this.directionsService;
@@ -171,6 +176,7 @@ export class HomePage implements AfterViewInit {
       directionsRenderer.setMap(this.map);
 
       this.places = data.waypoints;
+      this.setPhotos();
       let waypoints = data.waypoints.map((waypoint => {
         return {'location': waypoint.geometry.location};
       }))
@@ -244,6 +250,7 @@ export class HomePage implements AfterViewInit {
     this.origin = null;
     this.destination = null;
     this.places = [];
+    this.photos = [];
     this.selectedCard = null;
     this.tripSaved = false;
     this.newTrip = false;
@@ -253,6 +260,28 @@ export class HomePage implements AfterViewInit {
 
   closeMenu() {
     this.menuController.close();
+  }
+
+  setPhotos() {
+    timer(1000).subscribe(() => {
+    this.photos = [];
+    for (let place in this.places) {
+      const httpOptions = {
+        responseType: "blob"
+      };
+      this.http.get(`https://desolate-forest-23640.herokuapp.com/https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference=${this.places[place]['photos'][0]['photo_reference']}&key=API_KEY_HERE`, httpOptions).subscribe((response) => {
+        console.log(response)
+        var imageUrl = window.URL.createObjectURL(response);
+        let images = Array.from(document.getElementsByClassName('waypoint-image') as HTMLCollectionOf<HTMLImageElement>);
+        images[place].src = imageUrl;
+      }, (err) => {
+        console.log(err)
+        this.photos.push('');
+      });
+
+    }
+    });
+
   }
 
 }

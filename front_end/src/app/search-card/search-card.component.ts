@@ -115,24 +115,25 @@ export class SearchCardComponent implements OnInit {
     if (this.currentSearchType == SearchType.AREA_RADIUS) {
       request = `https://localhost:3000/api/v1/trips/calculatetrip?origin=${this.startLocationModel}&radius=${this.radiusModel}&num_waypoints=${this.stopsModel}&types=${this.getFilterTypes()}`;
       if (this.validateRadius()) {
-        this.makeRequest(request);
+        this.makeRequest(request, SearchType.AREA_RADIUS);
       } else {
         this.dangerToast('Invalid fields');
       }
     } else {
       request = `https://localhost:3000/api/v1/trips/calculatetrip?origin=${this.startLocationModel}&destination=${this.endLocationModel}&num_waypoints=${this.stopsModel}&types=${this.getFilterTypes()}`;
+      console.log(request)
       if (this.validateStartEnd()) {
-        this.makeRequest(request);
+        this.makeRequest(request, SearchType.START_END);
       } else {
         this.dangerToast('Invalid fields');
       }
     }
   }
 
-  makeRequest(request : string) {
+  makeRequest(request : string, searchType : SearchType) {
     this.http.get(request).subscribe((response) => {
       this.awaitHttp = false;  
-      if (response['waypoints'].length == 0){
+      if (response['waypoints'].length == 0 && searchType == SearchType.START_END){
         this.dangerToast('No waypoints were found to match this search. Please try again');
       } else {
         this.modalController.dismiss(JSON.stringify(response));
@@ -185,9 +186,10 @@ export class SearchCardComponent implements OnInit {
 
   getFilterTypes() {
     let types = '';
-    for (let filter in this.filtersModel) {
+    for (let filter of this.filtersModel) {
       types += filter + ',';
     }
+    types = types.substring(0, types.length - 1);
     return types;
   }
 }
