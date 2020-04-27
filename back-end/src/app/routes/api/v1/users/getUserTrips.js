@@ -17,7 +17,7 @@ module.exports = Router({mergeParams: true})
 	
     if(!user){
         req.logger.info({error: "User not found."});
-        res.sendStatus(404);
+        res.status(404).json({ status: 'Not Found' });
         return;
     }
 

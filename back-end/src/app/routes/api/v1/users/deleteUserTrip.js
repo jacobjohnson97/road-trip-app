@@ -18,15 +18,15 @@ module.exports = Router({mergeParams: true})
 
     if(!user){
         req.logger.info({error: "User not found."});
-        res.sendStatus(404);
+        res.status(404).json({ status: 'Not Found' });
         return;
     }
 
     try{
     	user.trips.id(tripID).remove();
     	await user.save();
-    	res.sendStatus(200);
+        res.status(200).json({ status: 'OK' });
     }catch{
-    	res.sendStatus(400);
+        res.status(400).json({ status: 'Bad Request' });
     }
 })

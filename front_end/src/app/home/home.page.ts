@@ -1,9 +1,9 @@
 import { Component, AfterViewInit, ViewChild } from '@angular/core';
-import { ModalController, AlertController, ToastController } from '@ionic/angular';
+import { ModalController, AlertController, ToastController, MenuController } from '@ionic/angular';
 import { SearchCardComponent } from '../search-card/search-card.component';
 import { LoginCardComponent } from '../login-card/login-card.component';
 import { MyTripsComponent } from '../my-trips/my-trips.component';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { } from 'googlemaps';
 
 enum TravelMode {
@@ -20,21 +20,28 @@ enum TravelMode {
   styleUrls: ['home.page.scss'],
 })
 export class HomePage implements AfterViewInit {
-  @ViewChild('gmap', {static: false}) gmapElement: any;
-  map: google.maps.Map;
+  @ViewChild('gmap', {static: false}) gmapElement : any;
+  map : google.maps.Map;
+  currentZoom : number;
+  currentCenter : any;
+  directionsService = new google.maps.DirectionsService();
+  directionsRenderer = new google.maps.DirectionsRenderer();
 
-  constructor(private modalController: ModalController, private alertController: AlertController, public toastController: ToastController, public http : HttpClient) {
-    if (localStorage.getItem('sectok')) {
-      this.loggedIn = true;
-    }
+  constructor(private modalController: ModalController, private alertController: AlertController, public toastController: ToastController, public http : HttpClient, public menuController : MenuController) {
+    this.validateLogin();
   }
 
   TravelMode = TravelMode;
   selectedCard : number = null;
   loggedIn : boolean = false;
   awaitSaveTrip : boolean;
-  trips : any[] = [];
-  places : any[] = [];//[{name: 'Name', imgSrc: '../../assets/shapes.svg', rating: '4/5'}, {name: 'Name', imgSrc: '../../assets/shapes.svg', rating: '4/5'}, {name: 'Name', imgSrc: '../../assets/shapes.svg', rating: '4/5'}, {name: 'Name', imgSrc: '../../assets/shapes.svg', rating: '4/5'}, {name: 'Name', imgSrc: '../../assets/shapes.svg', rating: '4/5'}, {name: 'Name', imgSrc: '../../assets/shapes.svg', rating: '4/5'}, {name: 'Name', imgSrc: '../../assets/shapes.svg', rating: '4/5'}, {name: 'Name', imgSrc: '../../assets/shapes.svg', rating: '4/5'}, {name: 'Name', imgSrc: '../../assets/shapes.svg', rating: '4/5'}]
+  tripSaved : boolean = false;
+  newTrip : boolean = false;
+  trip : any;
+  places : any[] = [];
+  origin : string;
+  destination : string;
+  placeIndexes : string[] = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
   ngAfterViewInit() {
     let mapProp = {
@@ -52,7 +59,8 @@ export class HomePage implements AfterViewInit {
     });
     await modal.present();
     let searchData = await modal.onWillDismiss();
-    this.renderWaypointData(searchData['data']);
+    await this.renderWaypointData(searchData['data']);
+    this.tripSaved = false;
   }
 
   async openLoginModal() {
@@ -64,29 +72,45 @@ export class HomePage implements AfterViewInit {
   }
 
   async openTripsModal() {
-    const modal = await this.modalController.create({
-      component: MyTripsComponent,
-      componentProps: {}
-    });
-    await modal.present();
-    let tripData = await modal.onWillDismiss();
-    this.renderWaypointData(tripData['data']);
+    await this.validateLogin();
+    if (this.loggedIn) {
+      const modal = await this.modalController.create({
+        component: MyTripsComponent,
+        componentProps: {}
+      });
+      await modal.present();
+      let tripData = await modal.onWillDismiss();
+      await this.renderWaypointData(tripData['data']);
+      this.tripSaved = true;
+    } else {
+      this.dangerToast('Please log in.');
+    }
   }
 
   saveTrip() {
+    this.validateLogin();
     if (!this.loggedIn) {
       this.openLoginModal();
     } else {
       this.awaitSaveTrip = true;
-      // http post
-      let error = false;
-      if (!error) {
+      let body = {
+        "trip": this.trip
+      }
+      const httpOptions = {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json; charset=utf-8',
+          'Authorization': 'Bearer ' + localStorage.getItem('sectok')
+        })
+      };
+
+      this.http.post('https://localhost:3000/api/trip', body, httpOptions).subscribe((response) => {
         this.successToast('Trip saved successfully!');
         this.awaitSaveTrip = false;
-      } else {
+        this.tripSaved = true;
+      }, (err) => {
         this.dangerToast('Something went wrong. Please try again later.');
         this.awaitSaveTrip = false;
-      }
+      });
     }
   }
 
@@ -132,11 +156,18 @@ export class HomePage implements AfterViewInit {
 
   renderWaypointData(data : any) {
     if (data != '{}') {
+      this.newTrip = true;
+      this.selectedCard = null;
+      this.trip = data;
+      this.tripSaved = false;
       data = JSON.parse(data);
+      this.origin = data['origin'];
+      this.destination = data['destination'];
       console.log('Rendering:', data)
 
-      let directionsService = new google.maps.DirectionsService();
-      let directionsRenderer = new google.maps.DirectionsRenderer();
+      let directionsService = this.directionsService;
+      let directionsRenderer = this.directionsRenderer;
+
       directionsRenderer.setMap(this.map);
 
       this.places = data.waypoints;
@@ -145,7 +176,6 @@ export class HomePage implements AfterViewInit {
       }))
 
       // Calculate and render route
-      let DRIVING = 'DRIVING'
       directionsService.route(
         {
           origin: data.origin,
@@ -153,15 +183,76 @@ export class HomePage implements AfterViewInit {
           waypoints: waypoints,
           travelMode: TravelMode.DRIVING
         },
-        function(response, status) {
+        async function(response, status) {
           if (status === 'OK') {
             directionsRenderer.setDirections(response);
           } else {
-            this.dangerToast('Something went wrong. Please try again later.');
             console.log('Directions request failed due to ' + status);
+            let toastController = new ToastController();
+            let toast = await toastController.create({
+              message: 'There was a problem rendering your route. Please reload and try again.',
+              color: 'danger',
+              duration: 3000
+            });
+            toast.present();
           }
       });
     }
+  }
+
+  selectPlace(index : number) {
+    if (this.selectedCard == index) {
+      this.selectedCard = null;
+      this.map.setZoom(this.currentZoom);
+      this.map.setCenter(this.currentCenter);
+    } else {
+      this.selectedCard = index;
+      if (this.newTrip) {
+        this.currentZoom = this.map.getZoom();
+        this.currentCenter = this.map.getCenter();
+        this.newTrip = false;
+      }
+      this.map.setZoom(17);
+      this.map.setCenter(this.places[index]['geometry']['location']);
+    }
+  }
+
+  validateLogin() {
+    if (localStorage.getItem('sectok')) {
+
+      const httpOptions = {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json; charset=utf-8',
+          'Authorization': 'Bearer ' + localStorage.getItem('sectok')
+        })
+      };
+      this.http.get('https://localhost:3000/api/token', httpOptions).subscribe((response) => {
+        this.loggedIn = true;
+      }, (err) => {
+        this.loggedIn = false;
+        localStorage.removeItem('sectok')
+      });
+
+    } else {
+      this.loggedIn = false;
+    }
+  }
+
+  clearRoute() {
+    this.directionsRenderer.set('directions', null);
+    this.trip = null;
+    this.origin = null;
+    this.destination = null;
+    this.places = [];
+    this.selectedCard = null;
+    this.tripSaved = false;
+    this.newTrip = false;
+    this.map.setZoom(7);
+    this.map.setCenter({lat: 40.0150, lng: -105.2705});
+  }
+
+  closeMenu() {
+    this.menuController.close();
   }
 
 }

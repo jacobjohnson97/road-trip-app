@@ -7,6 +7,6 @@ const verify = require('@security').verifyToken;
  * This endpoint check if a jwt is valid. For test only!
  */
 module.exports = Router({mergeParams: true})
-.post('/token', verify, async (req, res, next) => {
-    res.sendStatus(202)
+.get('/token', verify, async (req, res, next) => {
+    res.status(202).json({ status: 'Accepted' });
 })

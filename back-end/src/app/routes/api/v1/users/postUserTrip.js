@@ -18,10 +18,10 @@ module.exports = Router({mergeParams: true})
 
     if(user){
     	user.trips.push({'trip': JSON.parse(trip)});
-		const updated = await user.save();
-		res.sendStatus(200)
+		  const updated = await user.save();
+      res.status(200).json({ status: 'OK' });
     }else{
     	req.logger.info({error: "User not found."})
-    	res.sendStatus(404)
+      res.status(404).json({ message: 'Not Found' });
     }
 })
