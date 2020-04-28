@@ -1,0 +1,18 @@
+<ion-card style="height: 100%; text-align: center">
+
+  <h1 style="color: white"><b>My Trips</b></h1>
+
+  <div *ngIf="trips.length == 0" style="margin-top: 30%; font-size: 200%">
+    No trips to display
+  </div>
+  <div *ngIf="trips.length != 0">
+    <div *ngFor="let trip of trips; let i = index" style="display: flex; width: 100%; justify-content: center">
+      <ion-item style="width: 75%" (mouseenter)="hover = i" (mouseleave)="hover = null">
+        <ion-label>{{i + 1}}. {{trip['trip']['origin']}} -> {{trip['trip']['destination']}}</ion-label>
+        <ion-icon *ngIf="hover == i" name="open" (click)="selectTrip(i)"></ion-icon>
+        <ion-icon *ngIf="hover == i" name="trash" (click)="deleteTrip(i)"></ion-icon>
+      </ion-item>
+    </div>
+  </div>
+
+</ion-card>
