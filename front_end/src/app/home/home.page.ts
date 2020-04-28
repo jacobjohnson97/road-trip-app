@@ -6,6 +6,7 @@ import { MyTripsComponent } from '../my-trips/my-trips.component';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { } from 'googlemaps';
 import { timer } from 'rxjs';
+require('dotenv').config( {path: '../../.env'} );
 
 enum TravelMode {
   BICYCLING = 'BICYCLING',

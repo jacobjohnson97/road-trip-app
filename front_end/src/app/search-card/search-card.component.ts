@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
 import { HttpClient } from '@angular/common/http';
 import { timer } from 'rxjs';
+require('dotenv').config( {path: '../../.env'} );
 
 enum SearchType { AREA_RADIUS, START_END };
 enum DistanceUnits { MILES, KILOMETERS };
