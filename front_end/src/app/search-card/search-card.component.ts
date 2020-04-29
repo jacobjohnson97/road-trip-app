@@ -114,14 +114,14 @@ export class SearchCardComponent implements OnInit {
     this.awaitHttp = true;
     let request : string;
     if (this.currentSearchType == SearchType.AREA_RADIUS) {
-      request = `http://localhost:3000/api/v1/trips/calculatetrip?origin=${this.startLocationModel}&radius=${this.radiusModel}&num_waypoints=${this.stopsModel}&types=${this.getFilterTypes()}`;
+      request = `http://34.70.173.192:3000/api/v1/trips/calculatetrip?origin=${this.startLocationModel}&radius=${this.radiusModel}&num_waypoints=${this.stopsModel}&types=${this.getFilterTypes()}`;
       if (this.validateRadius()) {
         this.makeRequest(request, SearchType.AREA_RADIUS);
       } else {
         this.dangerToast('Invalid fields');
       }
     } else {
-      request = `http://localhost:3000/api/v1/trips/calculatetrip?origin=${this.startLocationModel}&destination=${this.endLocationModel}&num_waypoints=${this.stopsModel}&types=${this.getFilterTypes()}`;
+      request = `http://34.70.173.192:3000/api/v1/trips/calculatetrip?origin=${this.startLocationModel}&destination=${this.endLocationModel}&num_waypoints=${this.stopsModel}&types=${this.getFilterTypes()}`;
       console.log(request)
       if (this.validateStartEnd()) {
         this.makeRequest(request, SearchType.START_END);
