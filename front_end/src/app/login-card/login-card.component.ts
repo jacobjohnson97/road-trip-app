@@ -44,7 +44,7 @@ export class LoginCardComponent implements OnInit {
         })
       };
 
-      this.http.post('https://localhost:3000/api/login', body, httpOptions).subscribe((response) => {
+      this.http.post('http://localhost:3000/api/login', body, httpOptions).subscribe((response) => {
         this.awaitLogin = false;
         localStorage.setItem('sectok', response['token']);
         window.location.reload();
@@ -72,7 +72,7 @@ export class LoginCardComponent implements OnInit {
         })
       };
 
-      this.http.post('https://localhost:3000/api/register', body, httpOptions).subscribe((response) => {
+      this.http.post('http://localhost:3000/api/register', body, httpOptions).subscribe((response) => {
         this.successToast('Registration successful!');
         this.awaitRegister = false;
         this.action = Action.LOGIN;

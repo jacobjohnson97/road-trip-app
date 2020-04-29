@@ -106,7 +106,7 @@ export class HomePage implements AfterViewInit {
         })
       };
 
-      this.http.post('https://localhost:3000/api/trip', body, httpOptions).subscribe((response) => {
+      this.http.post('http://localhost:3000/api/trip', body, httpOptions).subscribe((response) => {
         this.successToast('Trip saved successfully!');
         this.awaitSaveTrip = false;
         this.tripSaved = true;
@@ -233,7 +233,7 @@ export class HomePage implements AfterViewInit {
           'Authorization': 'Bearer ' + localStorage.getItem('sectok')
         })
       };
-      this.http.get('https://localhost:3000/api/token', httpOptions).subscribe((response) => {
+      this.http.get('http://localhost:3000/api/token', httpOptions).subscribe((response) => {
         this.loggedIn = true;
       }, (err) => {
         this.loggedIn = false;
