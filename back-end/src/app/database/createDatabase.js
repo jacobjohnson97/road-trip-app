@@ -7,7 +7,7 @@ require('dotenv').config( {path: './.env'} )
 module.exports = ({ logger }) => {
     const url = process.env.MONGODB_URL
     console.log(url)
-    mongoose.connect(url, {useNewUrlParser: true}) //useUnifiedTopology: true
+    mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true})
     const db = glob.sync('./mongoSchemas/*.js', { cwd: __dirname })
     .map(filename => {
         return {

@@ -14,5 +14,8 @@ COPY . .
 # Expose the port the app runs in
 EXPOSE 4200
 
+# Build app
+RUN ionic build -prod
+
 # Serve the app
 CMD ["npm", "start"]
