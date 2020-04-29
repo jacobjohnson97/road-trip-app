@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
 import { HttpClient } from '@angular/common/http';
 import { timer } from 'rxjs';
-require('dotenv').config( {path: '../../.env'} );
+import { environment } from '../../environments/environment';
 
 enum SearchType { AREA_RADIUS, START_END };
 enum DistanceUnits { MILES, KILOMETERS };
@@ -58,7 +58,7 @@ export class SearchCardComponent implements OnInit {
       timer(1000).subscribe(() => {
         if (counter == this.autoCompleteCounter) {
           //https://cors-anywhere.herokuapp.com/
-          this.http.get(`https://desolate-forest-23640.herokuapp.com/https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${text}&key=${process.env.GOOGLE_MAPS_API_KEY}&components=country:us&types=(cities)`).subscribe((response) => {
+          this.http.get(`https://desolate-forest-23640.herokuapp.com/https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${text}&key=${environment['GOOGLE_MAPS_API_KEY']}&components=country:us&types=(cities)`).subscribe((response) => {
             this.awaitAutocomplete = false;  
             this.autoCompleteOptionsOrigin = [];
             for (let i = 0; i < response['predictions'].length; i++) {

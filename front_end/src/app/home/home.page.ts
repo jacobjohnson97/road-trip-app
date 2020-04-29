@@ -6,7 +6,7 @@ import { MyTripsComponent } from '../my-trips/my-trips.component';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { } from 'googlemaps';
 import { timer } from 'rxjs';
-require('dotenv').config( {path: '../../.env'} );
+import { environment } from '../../environments/environment';
 
 enum TravelMode {
   BICYCLING = 'BICYCLING',
@@ -270,7 +270,7 @@ export class HomePage implements AfterViewInit {
       const httpOptions = {
         responseType: 'blob' as 'blob'
       };
-      this.http.get(`https://desolate-forest-23640.herokuapp.com/https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference=${this.places[place]['photos'][0]['photo_reference']}&key=${process.env.GOOGLE_MAPS_API_KEY}`, httpOptions).subscribe((response) => {
+      this.http.get(`https://desolate-forest-23640.herokuapp.com/https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference=${this.places[place]['photos'][0]['photo_reference']}&key=${environment['GOOGLE_MAPS_API_KEY']}`, httpOptions).subscribe((response) => {
         var imageUrl = window.URL.createObjectURL(response);
         let images = Array.from(document.getElementsByClassName('waypoint-image') as HTMLCollectionOf<HTMLImageElement>);
         images[place].src = imageUrl;
