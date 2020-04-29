@@ -19,7 +19,7 @@ export class MyTripsComponent implements OnInit {
         'Authorization': 'Bearer ' + localStorage.getItem('sectok')
       })
     }
-    this.http.get(`http://34.70.173.192:3000/api/trip`, httpOptions).subscribe((response) => {
+    this.http.get(`https://34.70.173.192:3000/api/trip`, httpOptions).subscribe((response) => {
       this.awaitGetTrips = false;
       this.trips = response;
     }, (err) => {
@@ -55,7 +55,7 @@ export class MyTripsComponent implements OnInit {
                 'Authorization': 'Bearer ' + localStorage.getItem('sectok')
               })
             };
-            this.http.delete(`http://34.70.173.192:3000/api/trip?tripID=${this.trips[tripIndex]['_id']}`, httpOptions).subscribe((response) => {
+            this.http.delete(`https://34.70.173.192:3000/api/trip?tripID=${this.trips[tripIndex]['_id']}`, httpOptions).subscribe((response) => {
               this.successToast('Trip deleted successfully!');
               this.awaitDeleteTrip = false;
               this.ngOnInit();
