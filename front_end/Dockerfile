@@ -1,4 +1,4 @@
-# Create image based on the official Node 10 image from dockerhub
+# Create image based on the official Node 12 image from dockerhub
 FROM node:12
 
 # Change app directory
@@ -12,7 +12,7 @@ RUN npm install
 COPY . .
 
 # Expose the port the app runs in
-EXPOSE 8080
+EXPOSE 4200
 
 # Serve the app
 CMD ["npm", "start"]

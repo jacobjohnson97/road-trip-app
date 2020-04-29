@@ -5,7 +5,7 @@ services:
   front-end: # name of the first service
     build: front_end # specify the directory of the Dockerfile
     ports:
-      - "8080:8080" # specify port forewarding
+      - "4200:4200" # specify port forewarding
     volumes:
       - ./front_end:/app
 
