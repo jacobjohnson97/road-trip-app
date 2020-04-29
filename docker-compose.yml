@@ -6,8 +6,6 @@ services:
     build: front_end # specify the directory of the Dockerfile
     ports:
       - "4200:4200" # specify port forewarding
-    volumes:
-      - ./front_end:/app
 
   back-end: #name of the second service
     build: back-end # specify the directory of the Dockerfile
